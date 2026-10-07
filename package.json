@@ -1,0 +1,26 @@
+{
+    "name": "chess-arena",
+    "version": "1.0.0",
+    "private": "true",
+    "packageManager": "pnpm@10.28.0",
+    "engines": {
+        "node": ">=22"
+    },
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build",
+        "typecheck": "turbo run typecheck",
+        "test": "turbo run test",
+        "format": "prettier --write .",
+        "db:up": "docker compose up -d",
+        "db:down": "docker compose down",
+        "db:generate": "pnpm --filter @chess/server db:generate",
+        "db:migrate": "pnpm --filter @chess/server db:migrate",
+        "db:studio": "pnpm --filter @chess/server db:studio"
+    },
+    "devDependencies": {
+        "prettier": "^3.6.0",
+        "turbo": "^2.11.5",
+        "typescript": "^7.0.2"
+    }
+}

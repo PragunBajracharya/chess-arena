@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+.pnpm-store
+dist
+.turbo
 
 # testing
 /coverage
@@ -34,3 +37,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# copied from node_modules/stockfish on install
+apps/web/public/stockfish/
