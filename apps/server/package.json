@@ -1,0 +1,42 @@
+{
+    "name": "@chess/server",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsup",
+        "start": "node dist/index.js",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run --passWithNoTests",
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate",
+        "db:studio": "drizzle-kit studio"
+    },
+    "dependencies": {
+        "@chess/chess-core": "workspace:*",
+        "@chess/shared": "workspace:*",
+        "@socket.io/redis-adapter": "^8.3.0",
+        "better-auth": "^1.7.6",
+        "cors": "^2.8.6",
+        "dotenv": "^18.0.4",
+        "drizzle-orm": "^0.45.3",
+        "express": "^5.2.1",
+        "ioredis": "^6.0.0",
+        "pino": "^10.3.1",
+        "postgres": "^3.4.9",
+        "socket.io": "^4.8.4",
+        "zod": "^4.6.5"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "@types/node": "^22",
+        "drizzle-kit": "^0.31.11",
+        "pino-pretty": "^13.0.0",
+        "tsup": "^8.5.1",
+        "tsx": "^4.23.15",
+        "typescript": "^7.0.2",
+        "vitest": "^5.0.2"
+    }
+}

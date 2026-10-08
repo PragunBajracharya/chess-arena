@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { slideToMove } from "./index";
+import { sideToMove } from "./index";
 
 test("white moves first", () => {
-    expect(slideToMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")).toBe("white");
+    expect(sideToMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")).toBe("white");
 });
