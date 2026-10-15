@@ -4,6 +4,9 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
+import { nextPath } from "@/lib/next-path";
+import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/Field";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,30 +17,46 @@ export default function LoginPage() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     setLoading(true);
+    setError(null);
     const { error } = await signIn.email({
       email: String(form.get("email")),
       password: String(form.get("password")),
     });
     setLoading(false);
-    if (error) return setError(error.message ?? "Login failed");
-    router.push("/play");
+    if (error) return setError(error.message ?? "Email or password is incorrect.");
+    router.push(nextPath());
   }
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto mt-16 flex max-w-sm flex-col gap-4 px-6">
-      <h1 className="text-2xl font-bold">Log in</h1>
-      <input name="email" type="email" placeholder="Email" required className="input" />
-      <input name="password" type="password" placeholder="Password" required className="input" />
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <button className="btn" disabled={loading}>
-        {loading ? "Logging in…" : "Log in"}
-      </button>
-      <p className="text-sm">
-        No account?{" "}
-        <Link href="/register" className="underline">
-          Sign up
+    <>
+      <h1 className="text-[32px] leading-tight font-semibold tracking-tight">Log in</h1>
+      <p className="mt-2 text-muted">Welcome back. Log in to play rated games.</p>
+
+      <form onSubmit={onSubmit} className="mt-8 space-y-5" noValidate={false}>
+        <Field label="Email" name="email" type="email" autoComplete="email" required />
+        <Field
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+        />
+        {error && (
+          <p role="alert" className="rounded-lg bg-loss/10 px-3 py-2 text-[14px] text-loss">
+            {error}
+          </p>
+        )}
+        <Button type="submit" size="lg" className="w-full" disabled={loading}>
+          {loading ? "Logging in" : "Log in"}
+        </Button>
+      </form>
+
+      <p className="mt-6 text-[14px] text-muted">
+        New to Chess Arena?{" "}
+        <Link href="/register" className="font-medium text-brass hover:underline">
+          Create an account
         </Link>
       </p>
-    </form>
+    </>
   );
 }

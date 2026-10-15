@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Color, TimeControlId } from "@chess/shared";
 import { emitAck, getSocket } from "@/lib/socket";
 
@@ -8,30 +8,48 @@ type Status = "idle" | "searching" | "matched";
 
 export function useMatchmaking(onMatched: (gameId: string, color: Color) => void) {
   const [status, setStatus] = useState<Status>("idle");
+  const [timeControl, setTimeControl] = useState<TimeControlId | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const callback = useRef(onMatched);
+  callback.current = onMatched;
 
   useEffect(() => {
     const socket = getSocket();
-    const handler = ({ gameId, color }: { gameId: string; color: Color }) => {
+    const onMatch = ({ gameId, color }: { gameId: string; color: Color }) => {
       setStatus("matched");
-      onMatched(gameId, color);
+      callback.current(gameId, color);
     };
-    socket.on("queue:matched", handler);
-    socket.on("connect_error", (err) => setError(err.message));
+    const onError = () => setError("Can't reach the game server. Check that it is running.");
+    socket.on("queue:matched", onMatch);
+    socket.on("connect_error", onError);
     return () => {
-      socket.off("queue:matched", handler);
-      socket.off("connect_error");
+      socket.off("queue:matched", onMatch);
+      socket.off("connect_error", onError);
     };
-  }, [onMatched]);
+  }, []);
+
+  // Leave the queue if the player navigates away mid-search.
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  useEffect(() => {
+    return () => {
+      if (statusRef.current === "searching") getSocket().emit("queue:leave", () => {});
+    };
+  }, []);
 
   return {
     status,
+    timeControl,
+    startedAt,
     error,
-    join: async (timeControl: TimeControlId) => {
+    join: async (tc: TimeControlId) => {
       setError(null);
+      setTimeControl(tc);
+      setStartedAt(Date.now());
       setStatus("searching");
       try {
-        await emitAck((ack) => getSocket().emit("queue:join", { timeControl }, ack));
+        await emitAck((ack) => getSocket().emit("queue:join", { timeControl: tc }, ack));
       } catch (e) {
         setStatus("idle");
         setError((e as Error).message);
@@ -40,6 +58,7 @@ export function useMatchmaking(onMatched: (gameId: string, color: Color) => void
     leave: async () => {
       await emitAck((ack) => getSocket().emit("queue:leave", ack));
       setStatus("idle");
+      setTimeControl(null);
     },
   };
 }

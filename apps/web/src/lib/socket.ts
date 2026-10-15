@@ -23,3 +23,9 @@ export function emitAck<T>(
     send((res) => (res.ok ? resolve(res.data) : reject(new Error(res.error))));
   });
 }
+
+/** Drop the connection, e.g. on sign-out, so the next user gets a fresh one. */
+export function resetSocket() {
+  socket?.disconnect();
+  socket = null;
+}

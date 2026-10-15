@@ -1,27 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Chess Arena design tokens.
+ * Graphite surfaces, warm paper text, one brass accent (tournament clocks and
+ * trophies), and a maple/walnut board. Status colours are only for results.
+ */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #171a1f;
+  --color-panel: #1e2228;
+  --color-raised: #262b32;
+  --color-line: #2f353e;
+  --color-line-strong: #3c434d;
+
+  --color-text: #ece8e1;
+  --color-muted: #a0a6ae;
+  --color-faint: #737a84;
+
+  --color-brass: #c9a45c;
+  --color-brass-strong: #d9b770;
+  --color-brass-ink: #1b1710;
+
+  --color-win: #82b98e;
+  --color-loss: #d97a6c;
+  --color-draw: #a0a6ae;
+
+  --color-board-light: #e6dbc6;
+  --color-board-dark: #9a7a5c;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #161512;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer components {
-  .btn {
-    @apply rounded-md bg-[#779556] px-4 py-2 font-medium text-white hover:bg-[#6a8a4a] disabled:opacity-50;
-  }
-  .input {
-    @apply w-full rounded-md border border-neutral-300 bg-transparent px-3 py-2 dark:border-neutral-700;
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brass) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

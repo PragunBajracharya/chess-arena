@@ -69,3 +69,17 @@ export interface GameOverPayload {
   reason: GameEndReason;
   ratingChange?: { white: number; black: number };
 }
+
+/** One finished game from the current user's point of view (GET /api/games/me). */
+export interface GameSummary {
+  id: string;
+  timeControl: TimeControlId;
+  color: Color;
+  outcome: "win" | "loss" | "draw";
+  endReason: GameEndReason;
+  opponent: { id: string; name: string };
+  ratingBefore: number;
+  ratingAfter: number;
+  moveCount: number;
+  endedAt: string;
+}
