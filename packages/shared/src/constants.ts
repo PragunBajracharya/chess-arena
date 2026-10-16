@@ -1,4 +1,4 @@
-export const DEFAULT_RATING = 1500;
+export const DEFAULT_RATING = 400;
 
 /** Rating window used by matchmaking; widens the longer a player waits. */
 export const MATCHMAKING = {
