@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import type { Color, MoveInput } from "@chess/shared";
+import type { Color, MoveInput, PromotionPiece } from "@chess/shared";
 import { isPromotionMove, legalTargets, sideToMove, toBoardMatrix } from "@chess/chess-core";
 import { DropSquare } from "./DropSquare";
 import { Piece } from "./Piece";
+import { PromotionMove } from "./PromotionMove";
 
 const PIECE_NAMES = { p: "pawn", n: "knight", b: "bishop", r: "rook", q: "queen", k: "king" };
 
@@ -26,7 +27,7 @@ export interface BoardProps {
 /**
  * FEN-driven board, maple and walnut. Move by clicking a piece then a square, or by
  * dragging. Needs the app-wide <DndProvider> from app/providers.tsx when interactive.
- * Promotions auto-queen until a promotion picker is added.
+ * A pawn reaching the last rank opens a picker; the move is sent only once a piece is chosen.
  */
 export function Board({
     fen,
@@ -40,23 +41,38 @@ export function Board({
     className = "",
 }: BoardProps) {
     const [selected, setSelected] = useState<string | null>(null);
+    const [pending, setPending] = useState<{ from: string; to: string } | null>(null);
     const cells = useMemo(() => toBoardMatrix(fen, orientation), [fen, orientation]);
     const targets = useMemo(() => (selected ? legalTargets(fen, selected) : []), [fen, selected]);
     const turn = sideToMove(fen);
-    const canMove = interactive && !disabled && (playerColor == null || playerColor === turn);
+    const canMove =
+        interactive && !disabled && !pending && (playerColor == null || playerColor === turn);
+
+    // A new position (opponent moved, undo, reset) makes any open picker stale.
+    useEffect(() => setPending(null), [fen]);
 
     const play = useCallback(
         (from: string, to: string) => {
             setSelected(null);
             if (!legalTargets(fen, from).includes(to)) return;
-            onMove?.({
-                from,
-                to,
-                ...(isPromotionMove(fen, from, to) && { promotion: "q" as const }),
-            });
+            if (isPromotionMove(fen, from, to)) {
+                setPending({ from, to });
+                return;
+            }
+            onMove?.({ from, to });
         },
         [fen, onMove],
     );
+
+    const choosePromotion = useCallback(
+        (piece: PromotionPiece) => {
+            if (!pending) return;
+            onMove?.({ ...pending, promotion: piece });
+            setPending(null);
+        },
+        [pending, onMove],
+    );
+    const cancelPromotion = useCallback(() => setPending(null), []);
 
     const canAccept = useCallback(
         (from: string, to: string) => canMove && legalTargets(fen, from).includes(to),
@@ -78,7 +94,7 @@ export function Board({
         <div
             role={interactive ? "grid" : "img"}
             aria-label={interactive ? "Chess board" : "Chess position"}
-            className={`grid aspect-square w-full grid-cols-8 grid-rows-8 overflow-hidden rounded-[10px] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.6)] select-none ${className}`}
+            className={`relative grid aspect-square w-full grid-cols-8 grid-rows-8 overflow-hidden rounded-[10px] shadow-[0_12px_32px_-12px_rgba(0,0,0,0.6)] select-none ${className}`}
         >
             {cells.flat().map(({ square, piece }, index) => {
                 const file = square.charCodeAt(0) - 97;
@@ -167,6 +183,19 @@ export function Board({
                     </div>
                 );
             })}
+            {pending &&
+                (() => {
+                    const at = cells.flat().findIndex((c) => c.square === pending.to);
+                    return (
+                        <PromotionMove
+                            color={turn}
+                            column={at % 8}
+                            atTop={at < 8}
+                            onPick={choosePromotion}
+                            onCancel={cancelPromotion}
+                        />
+                    );
+                })()}
         </div>
     );
 }
