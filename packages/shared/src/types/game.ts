@@ -37,6 +37,8 @@ export interface PlayerInfo {
   id: string;
   name: string;
   rating: number;
+  /** Profile picture URL, if the player uploaded one. */
+  image?: string | null;
 }
 
 export interface ClockState {
@@ -61,6 +63,23 @@ export interface GameState {
   result: GameResult | null;
   endReason: GameEndReason | null;
   createdAt: number;
+  /**
+   * While nobody has moved yet: when the game aborts unless the side to move plays.
+   * Null once both sides have made a move.
+   */
+  abortAt?: number | null;
+  /** Players whose connection dropped, with when they forfeit if they don't return. */
+  absent?: Partial<Record<Color, number>>;
+}
+
+/** Why an unrated game was called off. Aborted games are not saved or rated. */
+export type AbortReason = "no_first_move" | "player_aborted" | "player_left";
+
+export interface GameAbortedPayload {
+  gameId: string;
+  reason: AbortReason;
+  /** The player responsible, when there is one. */
+  by: Color | null;
 }
 
 export interface GameOverPayload {
@@ -77,9 +96,31 @@ export interface GameSummary {
   color: Color;
   outcome: "win" | "loss" | "draw";
   endReason: GameEndReason;
-  opponent: { id: string; name: string };
+  opponent: { id: string; name: string; image: string | null };
   ratingBefore: number;
   ratingAfter: number;
   moveCount: number;
+  endedAt: string;
+}
+
+/** A finished game as stored, with names, for the review page (GET /api/games/:id). */
+export interface GameRecordPlayer {
+  id: string;
+  name: string;
+  image: string | null;
+  ratingBefore: number;
+  ratingAfter: number;
+}
+
+export interface GameRecord {
+  id: string;
+  timeControl: TimeControlId;
+  result: GameResult;
+  endReason: GameEndReason;
+  pgn: string;
+  moves: MoveRecord[];
+  white: GameRecordPlayer;
+  black: GameRecordPlayer;
+  startedAt: string;
   endedAt: string;
 }

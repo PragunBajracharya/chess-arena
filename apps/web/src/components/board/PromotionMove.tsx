@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import Image from "next/image";
-import type { Color, PromotionPiece } from "@chess/shared";
+import type { Color, PieceSet, PromotionPiece } from "@chess/shared";
+import { pieceSrc } from "@/lib/preferences";
 
-/** Queen first, so it sits on the promotion square itself, as on most sites. */
+/** Queen first, so it sits on the promotion square itself. */
 const OPTIONS: { piece: PromotionPiece; name: string }[] = [
   { piece: "q", name: "queen" },
   { piece: "n", name: "knight" },
@@ -15,20 +16,28 @@ const OPTIONS: { piece: PromotionPiece; name: string }[] = [
 interface PromotionMoveProps {
   /** Colour of the pawn being promoted; decides which piece images to show. */
   color: Color;
-  /** Column of the promotion square as drawn on screen, 0 = left edge. */
-  column: number;
-  /** True when the promotion square is on the top row of the board as drawn. */
-  atTop: boolean;
+  pieceSet: PieceSet;
+  /**
+   * "down" when the promotion square is on the top row of the board as drawn,
+   * "up" when it is on the bottom row, so the strip always stays on the board.
+   */
+  direction: "down" | "up";
   onPick: (piece: PromotionPiece) => void;
   onCancel: () => void;
 }
 
 /**
- * Four pieces stacked over the promotion square, running from the board edge
- * toward the middle. Clicking outside or pressing Escape cancels the move.
- * Render inside the board's `relative` container.
+ * Replaces the promotion square with a 1x4 strip of pieces: queen on the square,
+ * then knight, rook and bishop toward the middle of the board.
+ * Render it as the content of that square (which is `relative`); Escape cancels.
  */
-export function PromotionMove({ color, column, atTop, onPick, onCancel }: PromotionMoveProps) {
+export function PromotionMove({
+  color,
+  pieceSet,
+  direction,
+  onPick,
+  onCancel,
+}: PromotionMoveProps) {
   const first = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -38,42 +47,42 @@ export function PromotionMove({ color, column, atTop, onPick, onCancel }: Promot
     return () => window.removeEventListener("keydown", onKey);
   }, [onCancel]);
 
+  // The square underneath turns Enter and Space into a click and cancels the key's
+  // default action, which would stop these buttons working from the keyboard.
+  function onKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
+    e.stopPropagation();
+    if (e.key === "Escape") onCancel();
+  }
+
   return (
-    <>
-      <button
-        type="button"
-        aria-label="Cancel promotion"
-        onClick={onCancel}
-        className="absolute inset-0 z-40 cursor-default bg-black/45"
-      />
-      <div
-        role="dialog"
-        aria-label="Choose a piece to promote to"
-        className={`absolute z-50 flex h-1/2 w-[12.5%] overflow-hidden rounded-md bg-panel shadow-[0_12px_32px_-8px_rgba(0,0,0,0.7)] ${
-          atTop ? "top-0 flex-col" : "bottom-0 flex-col-reverse"
-        }`}
-        style={{ left: `${column * 12.5}%` }}
-      >
-        {OPTIONS.map(({ piece, name }, i) => (
-          <button
-            key={piece}
-            ref={i === 0 ? first : undefined}
-            type="button"
-            aria-label={`Promote to ${name}`}
-            onClick={() => onPick(piece)}
-            className="flex h-1/4 items-center justify-center hover:bg-raised focus-visible:bg-raised focus-visible:outline-offset-[-2px]"
-          >
-            <Image
-              src={`/pieces/${color === "white" ? "w" : "b"}${piece}.png`}
-              alt=""
-              width={80}
-              height={80}
-              draggable={false}
-              className="h-[85%] w-[85%]"
-            />
-          </button>
-        ))}
-      </div>
-    </>
+    <div
+      role="dialog"
+      aria-label="Choose a piece to promote to"
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={onKeyDown}
+      className={`absolute left-0 z-50 flex h-[400%] w-full overflow-hidden rounded-[4px] bg-board-light shadow-[0_0_0_3px_var(--color-brass),0_12px_32px_-8px_rgba(0,0,0,0.7)] ${
+        direction === "down" ? "top-0 flex-col" : "bottom-0 flex-col-reverse"
+      }`}
+    >
+      {OPTIONS.map(({ piece, name }, i) => (
+        <button
+          key={piece}
+          ref={i === 0 ? first : undefined}
+          type="button"
+          aria-label={`Promote to ${name}`}
+          onClick={() => onPick(piece)}
+          className="flex min-h-0 flex-1 items-center justify-center hover:bg-black/10 focus-visible:bg-black/10 focus-visible:outline-offset-[-2px]"
+        >
+          <Image
+            src={pieceSrc(pieceSet, color, piece)}
+            alt=""
+            width={80}
+            height={80}
+            draggable={false}
+            className="h-[88%] w-[88%]"
+          />
+        </button>
+      ))}
+    </div>
   );
 }

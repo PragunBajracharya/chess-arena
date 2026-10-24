@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { GameSummary } from "@chess/shared";
 import { Avatar } from "@/components/ui/Avatar";
 import { RatingDelta, ResultChip } from "@/components/ui/ResultChip";
@@ -25,14 +26,17 @@ export function GamesTable({ games }: { games: GameSummary[] }) {
             <th scope="col" className="py-3 text-right font-normal">
               Rating
             </th>
-            <th scope="col" className="py-3 pr-5 text-right font-normal">
+            <th scope="col" className="py-3 text-right font-normal">
               Played
+            </th>
+            <th scope="col" className="py-3 pr-5">
+              <span className="sr-only">Review</span>
             </th>
           </tr>
         </thead>
         <tbody>
           {games.map((g) => (
-            <tr key={g.id} className="border-b border-line last:border-0">
+            <tr key={g.id} className="border-b border-line last:border-0 hover:bg-raised/40">
               <td className="py-3 pl-5">
                 <div className="flex items-center gap-3">
                   <ResultChip outcome={g.outcome} />
@@ -41,7 +45,7 @@ export function GamesTable({ games }: { games: GameSummary[] }) {
               </td>
               <td className="py-3">
                 <div className="flex items-center gap-2.5">
-                  <Avatar name={g.opponent.name} size={28} />
+                  <Avatar name={g.opponent.name} image={g.opponent.image} size={28} />
                   <span className="font-medium">{g.opponent.name}</span>
                   <span className="text-[13px] text-muted">
                     as {g.color === "white" ? "Black" : "White"}
@@ -57,7 +61,16 @@ export function GamesTable({ games }: { games: GameSummary[] }) {
                 <span className="mr-2 tabular-nums">{g.ratingAfter}</span>
                 <RatingDelta before={g.ratingBefore} after={g.ratingAfter} />
               </td>
-              <td className="py-3 pr-5 text-right text-muted">{relativeDate(g.endedAt)}</td>
+              <td className="py-3 text-right text-muted">{relativeDate(g.endedAt)}</td>
+              <td className="py-3 pr-5 text-right">
+                <Link
+                  href={`/game/${g.id}/review`}
+                  className="rounded-md px-2 py-1 text-[13px] font-medium text-brass hover:bg-brass/10"
+                  aria-label={`Review game against ${g.opponent.name}`}
+                >
+                  Review
+                </Link>
+              </td>
             </tr>
           ))}
         </tbody>

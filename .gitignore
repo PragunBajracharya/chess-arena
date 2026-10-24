@@ -40,3 +40,7 @@ next-env.d.ts
 
 # copied from node_modules/stockfish on install
 apps/web/public/stockfish/
+
+# profile pictures stored locally in development
+apps/server/uploads/
+dump.rdb

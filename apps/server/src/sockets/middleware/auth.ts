@@ -7,19 +7,20 @@ import type { AppSocket } from "../types";
  * as HTTP requests (client connects with `withCredentials: true`).
  */
 export async function socketAuth(socket: AppSocket, next: (err?: Error) => void) {
-  try {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(socket.handshake.headers),
-    });
-    if (!session) return next(new Error("Unauthorized"));
+    try {
+        const session = await auth.api.getSession({
+            headers: fromNodeHeaders(socket.handshake.headers),
+        });
+        if (!session) return next(new Error("Unauthorized"));
 
-    socket.data.user = {
-      id: session.user.id,
-      name: session.user.name,
-      rating: session.user.rating,
-    };
-    next();
-  } catch (err) {
-    next(err as Error);
-  }
+        socket.data.user = {
+            id: session.user.id,
+            name: session.user.name,
+            rating: session.user.rating,
+            image: session.user.image ?? null,
+        };
+        next();
+    } catch (err) {
+        next(err as Error);
+    }
 }

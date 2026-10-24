@@ -5,6 +5,7 @@ import { Bot } from "lucide-react";
 import { BOT_LEVELS, type Color, type GameOverPayload, type MoveInput } from "@chess/shared";
 import { START_FEN, applyMove, sideToMove } from "@chess/chess-core";
 import { useStockfish } from "@/hooks/useStockfish";
+import { useMoveSounds } from "@/lib/sounds";
 import { useSession } from "@/lib/auth-client";
 import { reasonLabel } from "@/lib/format";
 import { Board } from "@/components/board/Board";
@@ -13,6 +14,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { GameLayout, StatusLine } from "./GameLayout";
 import { MoveList } from "./MoveList";
 import { PlayerStrip } from "./PlayerStrip";
+import { SoundToggle } from "./SoundToggle";
 
 interface Played {
   san: string;
@@ -49,6 +51,10 @@ export function BotGame() {
   const fen = moves.at(-1)?.fen ?? START_FEN;
   const botTurn = !result && sideToMove(fen) !== playerColor;
   const botColor: Color = playerColor === "white" ? "black" : "white";
+  useMoveSounds(
+    moves.map((m) => m.san),
+    !!result,
+  );
 
   function play(move: MoveInput) {
     const res = applyMove(
@@ -116,7 +122,10 @@ export function BotGame() {
         <>
           <section className="rounded-xl border border-line bg-panel">
             <div className="border-b border-line px-5 py-4">
-              <p className="text-[13px] text-muted">Unrated practice game</p>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-[13px] text-muted">Unrated practice game</p>
+                <SoundToggle />
+              </div>
               <div className="mt-1">
                 {!ready ? (
                   <StatusLine>Loading the engine</StatusLine>

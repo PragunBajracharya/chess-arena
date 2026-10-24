@@ -16,6 +16,7 @@
         "db:down": "docker compose down",
         "db:generate": "pnpm --filter @chess/server db:generate",
         "db:migrate": "pnpm --filter @chess/server db:migrate",
+        "db:fresh": "pnpm --filter @chess/server db:fresh",
         "db:studio": "pnpm --filter @chess/server db:studio"
     },
     "devDependencies": {

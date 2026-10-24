@@ -6,57 +6,270 @@
  * trophies), and a maple/walnut board. Status colours are only for results.
  */
 @theme {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #171a1f;
-  --color-panel: #1e2228;
-  --color-raised: #262b32;
-  --color-line: #2f353e;
-  --color-line-strong: #3c434d;
+    --color-ink: #171a1f;
+    --color-panel: #1e2228;
+    --color-raised: #262b32;
+    --color-line: #2f353e;
+    --color-line-strong: #3c434d;
 
-  --color-text: #ece8e1;
-  --color-muted: #a0a6ae;
-  --color-faint: #737a84;
+    --color-text: #ece8e1;
+    --color-muted: #a0a6ae;
+    --color-faint: #737a84;
 
-  --color-brass: #c9a45c;
-  --color-brass-strong: #d9b770;
-  --color-brass-ink: #1b1710;
+    --color-brass: #c9a45c;
+    --color-brass-strong: #d9b770;
+    --color-brass-ink: #1b1710;
 
-  --color-win: #82b98e;
-  --color-loss: #d97a6c;
-  --color-draw: #a0a6ae;
+    --color-win: #82b98e;
+    --color-loss: #d97a6c;
+    --color-draw: #a0a6ae;
 
-  --color-board-light: #e6dbc6;
-  --color-board-dark: #9a7a5c;
+    --color-board-light: #e6dbc6;
+    --color-board-dark: #9a7a5c;
 }
 
 html {
-  color-scheme: dark;
+    color-scheme: dark;
+}
+
+/*
+ * Light theme: same token names, so every component follows. Brass is darker
+ * here so text in it keeps a 4.5:1 contrast on white panels, and the ink on
+ * brass buttons flips to white for the same reason.
+ */
+html[data-theme="light"] {
+    color-scheme: light;
+    --color-ink: #f3f0eb;
+    --color-panel: #ffffff;
+    --color-raised: #f2eee7;
+    --color-line: #e3ddd3;
+    --color-line-strong: #cec6b8;
+
+    --color-text: #1d2026;
+    --color-muted: #5a616b;
+    --color-faint: #80868f;
+
+    --color-brass: #8a6526;
+    --color-brass-strong: #74531c;
+    --color-brass-ink: #ffffff;
+
+    --color-win: #2f7a43;
+    --color-loss: #b4442f;
+    --color-draw: #5a616b;
+}
+
+/* Board colour schemes, chosen in Settings. Walnut is the default in @theme. */
+html[data-board="green"] {
+    --color-board-light: #ebecd0;
+    --color-board-dark: #779556;
+}
+html[data-board="blue"] {
+    --color-board-light: #dee3e6;
+    --color-board-dark: #8ca2ad;
+}
+html[data-board="slate"] {
+    --color-board-light: #d4d7dc;
+    --color-board-dark: #737d8c;
 }
 
 body {
-  background: var(--color-ink);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+    background: var(--color-ink);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-brass);
-  outline-offset: 2px;
+    outline: 2px solid var(--color-brass);
+    outline-offset: 2px;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-brass) 35%, transparent);
+    background: color-mix(in srgb, var(--color-brass) 35%, transparent);
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background: radial-gradient(circle at 75% -20%, #1b2140 0%, transparent 32%), #0d1018;
+}
+
+.panel {
+    background: linear-gradient(145deg, #161b27, #121620);
+    border: 1px solid #242b39;
+    border-radius: 12px;
+}
+
+.eyebrow {
+    margin: 0 0 10px;
+}
+.eyebrow.coral {
+    color: var(--color-coral);
+}
+
+.error-shell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: 32px 20px;
+    background: radial-gradient(circle at 50% 10%, #292553 0%, transparent 40%), #0d1018;
+}
+
+.error-card {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    padding: 48px 42px 28px;
+    text-align: center;
+}
+
+.error-piece {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 25px;
+    border: 1px solid #51448c;
+    border-radius: 22px;
+    color: #b1a3ff;
+    background: #262044;
+    font-size: 43px;
+    box-shadow: 0 0 60px #7d6cff25;
+}
+
+.error-card h1 {
+    margin: 0 0 10px;
+    font-size: clamp(30px, 5vw, 44px);
+    letter-spacing: -1.8px;
+}
+
+.error-copy {
+    max-width: 370px;
+    margin: 0 auto;
+    color: #8e98aa;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 28px 0 34px;
+}
+
+.error-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.error-actions svg,
+.error-help svg {
+    width: 15px;
+}
+
+.error-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    width: min(320px, 100%);
+    margin: 0 auto 24px;
+    border: 8px solid #161b27;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px #0005;
+}
+
+.error-board span {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    font-size: 20px;
+}
+
+.error-board .light {
+    background: #d9cdb7;
+    color: #402d2c;
+}
+
+.error-board .dark {
+    background: #6c5660;
+    color: #f9f1df;
+}
+
+.error-help {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #778196;
+    font-size: 11px;
+}
+
+.error-help:hover {
+    color: #fff;
+}
+
+.error-orbit {
+    position: absolute;
+    border: 1px solid #ffffff08;
+    border-radius: 50%;
+}
+
+.orbit-one {
+    width: 680px;
+    height: 680px;
+}
+.orbit-two {
+    width: 980px;
+    height: 980px;
+}
+
+.ghost-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #323a4b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #bac1ce;
+    background: #151a25;
+    font-size: 12px;
+    cursor: pointer;
+}
+.ghost-button:hover {
+    background: #202738;
+}
+.ghost-button svg {
+    width: 15px;
+}
+
+.text-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #9ca6b8;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 10px;
+}
+.text-button svg {
+    width: 13px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

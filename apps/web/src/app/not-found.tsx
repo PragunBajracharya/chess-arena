@@ -19,7 +19,7 @@ export default function NotFound() {
                     another board.
                 </p>
                 <div className="error-actions">
-                    <Link href="/" className="ghost-button">
+                    <Link href="/home" className="ghost-button">
                         <Home /> Back to dashboard
                     </Link>
                     <Link href="/play" className="text-button">
@@ -36,9 +36,6 @@ export default function NotFound() {
                         </span>
                     ))}
                 </div>
-                <Link href="/help" className="error-help">
-                    <Search /> Need help finding something?
-                </Link>
             </section>
         </main>
     );

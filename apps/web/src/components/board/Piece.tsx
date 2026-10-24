@@ -7,45 +7,45 @@ import { useDrag } from "react-dnd";
 export const PIECE = "piece";
 
 export interface DragItem {
-    from: string;
+  from: string;
 }
 
 interface PieceProps {
-    image: string;
-    /** The square this piece stands on. */
-    square: string;
-    canDrag: boolean;
-    /** Called when a drag starts, so the board can show legal targets. */
-    onDragStart: (square: string) => void;
-    onDragEnd: () => void;
+  image: string;
+  /** The square this piece stands on. */
+  square: string;
+  canDrag: boolean;
+  /** Called when a drag starts, so the board can show legal targets. */
+  onDragStart: (square: string) => void;
+  onDragEnd: () => void;
 }
 
 export function Piece({ image, square, canDrag, onDragStart, onDragEnd }: PieceProps) {
-    const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>(
-        () => ({
-            type: PIECE,
-            item: () => {
-                onDragStart(square);
-                return { from: square };
-            },
-            canDrag: () => canDrag,
-            end: () => onDragEnd(),
-            collect: (monitor) => ({ isDragging: monitor.isDragging() }),
-        }),
-        [square, canDrag, onDragStart, onDragEnd],
-    );
+  const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>(
+    () => ({
+      type: PIECE,
+      item: () => {
+        onDragStart(square);
+        return { from: square };
+      },
+      canDrag: () => canDrag,
+      end: () => onDragEnd(),
+      collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+    }),
+    [square, canDrag, onDragStart, onDragEnd],
+  );
 
-    return (
-        <Image
-            ref={(node) => {
-                drag(node);
-            }}
-            src={image}
-            alt=""
-            width={80}
-            height={80}
-            className={`relative z-10 h-[88%] w-[88%] ${canDrag ? "cursor-grab active:cursor-grabbing" : ""}`}
-            style={{ opacity: isDragging ? 0.35 : 1 }}
-        />
-    );
+  return (
+    <Image
+      ref={(node) => {
+        drag(node);
+      }}
+      src={image}
+      alt=""
+      width={80}
+      height={80}
+      className={`relative z-10 h-[88%] w-[88%] ${canDrag ? "cursor-grab active:cursor-grabbing" : ""}`}
+      style={{ opacity: isDragging ? 0.35 : 1 }}
+    />
+  );
 }

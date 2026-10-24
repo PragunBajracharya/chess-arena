@@ -56,8 +56,14 @@ export function useMatchmaking(onMatched: (gameId: string, color: Color) => void
       }
     },
     leave: async () => {
-      await emitAck((ack) => getSocket().emit("queue:leave", ack));
-      setStatus("idle");
+      try {
+        await emitAck((ack) => getSocket().emit("queue:leave", ack));
+      } catch (e) {
+        setError((e as Error).message);
+        return;
+      }
+      // A match may have arrived while the cancel was in flight; the redirect wins.
+      setStatus((s) => (s === "matched" ? s : "idle"));
       setTimeControl(null);
     },
   };

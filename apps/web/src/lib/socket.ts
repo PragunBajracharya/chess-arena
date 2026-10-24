@@ -29,3 +29,13 @@ export function resetSocket() {
   socket?.disconnect();
   socket = null;
 }
+
+/**
+ * Reconnect the same connection, so the server reads the session again (the
+ * player's name and picture are taken from it when the socket connects).
+ */
+export function refreshSocket() {
+  if (!socket) return;
+  socket.disconnect();
+  socket.connect();
+}

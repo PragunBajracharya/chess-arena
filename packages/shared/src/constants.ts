@@ -1,4 +1,4 @@
-export const DEFAULT_RATING = 400;
+export const DEFAULT_RATING = 1500;
 
 /** Rating window used by matchmaking; widens the longer a player waits. */
 export const MATCHMAKING = {
@@ -29,3 +29,13 @@ export const BOT_LEVELS = [
 ] as const;
 
 export type BotLevel = (typeof BOT_LEVELS)[number];
+
+/** Timers that keep games moving. */
+export const GAME_TIMEOUTS = {
+  /** Each side must make its first move within this, or the game is aborted. */
+  firstMoveMs: 30_000,
+  /** A player who loses every connection mid-game forfeits after this. */
+  reconnectMs: 60_000,
+  /** How long after a game ends a rematch can still be offered or accepted. */
+  rematchMs: 5 * 60_000,
+} as const;

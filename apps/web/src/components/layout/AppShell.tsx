@@ -11,6 +11,7 @@ import {
   Menu,
   MessageSquare,
   Puzzle,
+  Settings,
   Swords,
   Tv,
   Users,
@@ -34,6 +35,7 @@ const playNav: NavItem[] = [
   { href: "/play", label: "Play online", icon: Swords },
   { href: "/play/bot", label: "Play the computer", icon: Bot },
   { href: "/history", label: "Game history", icon: History },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 /** Shown so the roadmap is visible, but not clickable until built. */
@@ -49,8 +51,11 @@ const titles: [string, string][] = [
   ["/play/bot", "Play the computer"],
   ["/play", "Play online"],
   ["/history", "Game history"],
+  ["/review", "Game review"],
   ["/game/", "Live game"],
   ["/home", "Home"],
+  ["/test", "Test board"],
+  ["/settings", "Settings"],
 ];
 
 function isActive(pathname: string, href: string) {
@@ -124,7 +129,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const title = titles.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? "";
+  const title =
+    titles.find(([prefix]) =>
+      prefix === "/review" ? pathname.endsWith(prefix) : pathname.startsWith(prefix),
+    )?.[1] ?? "";
 
   useEffect(() => setDrawerOpen(false), [pathname]);
 
@@ -169,7 +177,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="text-[15px] font-medium">{title}</p>
         </div>
         {isPending ? null : session ? (
-          <UserMenu name={session.user.name} rating={session.user.rating} />
+          <UserMenu
+            name={session.user.name}
+            rating={session.user.rating}
+            image={session.user.image}
+          />
         ) : (
           <div className="flex items-center gap-2">
             <Link href="/login" className={buttonClass("ghost", "sm")}>
